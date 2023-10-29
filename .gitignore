@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+#local files for working on
+download_script.py
+Strava_access.json
+
 # C extensions
 *.so
 
