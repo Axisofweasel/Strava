@@ -179,7 +179,7 @@ def get_activities(cred_file: str, per_page: int, page: int, output_file: str = 
         payload = {"access_token": access_token, "per_page": per_page, "page": page}
         url = R.get("https://www.strava.com/api/v3/athlete/activities", params= payload)
         response = url.json()
-        
+        rate_monitoring(url)
         if output_file is not None:
             with open(output_file, 'a') as file:
                 json.dump(response, file, indent=4)
@@ -204,3 +204,13 @@ def get_activities_v2(cred_file:str,activity_id:int, include_all_efforts:bool,ou
         df = pd.json_normalize(response, max_level=2)
         
     return df
+
+def rate_monitoring(url_object):
+    header = url_object.headers
+    limit = header['X-Ratelimit-Limit']
+    usage = header['X-RateLimit-Usage']
+    limits = limit.split(",")
+    usages = usage.split(",")
+    print(f"quarter hour usage {usages[0]} of {limits[0]} ")
+    print(f"quarter hour usage {usages[1]} of {limits[1]} ")
+    return limits, usage
