@@ -140,7 +140,7 @@ def get_athleteid(cred_file:str, output_file:str = None):
         payload = {"access_token":access_token}
         url = R.get("https://www.strava.com/api/v3/athlete", params=payload)
         response = url.json()
-        
+        rate_monitoring(url)
         if output_file is not None:
             with open(output_file, 'w') as file:
                 json.dump(response, file, indent=4)
@@ -158,13 +158,13 @@ def get_activities_total(cred_file:str, output_file:str = None):
         payload = {"access_token":access_token}
         url = R.get(f"https://www.strava.com/api/v3/athletes/402063/stats",params=payload)
         response = url.json()
-        
+        rate_monitoring(url)
+        http_response(url)
         if  output_file is not None:
             with open(output_file,'w') as file:
                 json.dump(response, file, indent=4)
-            
         df=pd.json_normalize(response, max_level=2)
-        print(url.status_code)
+        
     return df
 
 @sleep_and_retry
@@ -180,6 +180,7 @@ def get_activities(cred_file: str, per_page: int, page: int, output_file: str = 
         url = R.get("https://www.strava.com/api/v3/athlete/activities", params= payload)
         response = url.json()
         rate_monitoring(url)
+        http_response(url)
         if output_file is not None:
             with open(output_file, 'a') as file:
                 json.dump(response, file, indent=4)
@@ -197,7 +198,7 @@ def get_activities_v2(cred_file:str,activity_id:int, include_all_efforts:bool,ou
         payload = {"access_token":access_token, "per_page":per_page,"page":page}
         url = R.get("https://www.strava.com/api/v3/athlete/activities", params=payload)
         response = url.json()
-        
+        rate_monitoring(url)
         if output_file is not None:
             with open(output_file, 'w') as file:
                 json.dump(response, file, indent=4)
@@ -214,3 +215,52 @@ def rate_monitoring(url_object):
     print(f"quarter hour usage {usages[0]} of {limits[0]} ")
     print(f"quarter hour usage {usages[1]} of {limits[1]} ")
     return limits, usage
+
+def http_response(url_object):
+    status_code = url_object.status_code
+    http_status_codes = {
+        100: 'Continue',
+        101: 'Switching Protocols',
+        200: 'OK',
+        201: 'Created',
+        202: 'Accepted',
+        203: 'Non-Authoritative Information',
+        204: 'No Content',
+        205: 'Reset Content',
+        206: 'Partial Content',
+        300: 'Multiple Choices',
+        301: 'Moved Permanently',
+        302: 'Found',
+        303: 'See Other',
+        304: 'Not Modified',
+        305: 'Use Proxy',
+        307: 'Temporary Redirect',
+        308: 'Permanent Redirect',
+        400: 'Bad Request',
+        401: 'Unauthorized',
+        402: 'Payment Required',
+        403: 'Forbidden',
+        404: 'Not Found',
+        405: 'Method Not Allowed',
+        406: 'Not Acceptable',
+        407: 'Proxy Authentication Required',
+        408: 'Request Timeout',
+        409: 'Conflict',
+        410: 'Gone',
+        411: 'Length Required',
+        412: 'Precondition Failed',
+        413: 'Payload Too Large',
+        414: 'URI Too Long',
+        415: 'Unsupported Media Type',
+        416: 'Range Not Satisfiable',
+        417: 'Expectation Failed',
+        418: 'Im a Teapot',
+        429: 'Too Many Requests',
+        500: 'Internal Server Error',
+        501: 'Not Implemented',
+        502: 'Bad Gateway',
+        503: 'Service Unavailable',
+        504: 'Gateway Timeout',
+        505: 'HTTP Version Not Supported'
+    }
+    print(f"{status_code}: {http_status_codes.get(status_code, 'Unknown')}")
