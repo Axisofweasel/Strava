@@ -6,6 +6,7 @@ __pycache__/
 #local files for working on
 download_script.py
 Strava_access.json
+activity_output_list.json
 
 # C extensions
 *.so
