@@ -168,7 +168,7 @@ def get_activities_total(cred_file:str, output_file:str = None):
     return df
 
 @sleep_and_retry
-@limits(calls = 15, period = limit_time)
+@limits(calls = 100, period = limit_time)
 def get_activities(cred_file: str, per_page: int, page: int, output_file: str = None):
 
 ##TODO: use this to return all activities and create summary table of results
@@ -187,6 +187,8 @@ def get_activities(cred_file: str, per_page: int, page: int, output_file: str = 
         df = pd.json_normalize(response, max_level=2)
     return df
 
+@sleep_and_retry
+@limits(calls = 100, period = limit_time)
 def get_activities_v2(cred_file:str,activity_id:int, include_all_efforts:bool,output_file:str = None):
 
 ##TODO: use this to get each activitites details
